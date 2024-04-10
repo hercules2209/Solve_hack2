@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>VI-T-rack</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+        }
+
+        /* Header Styles */
+        h1 {
+            color: #1e88e5;
+            margin-bottom: 2rem;
+        }
+
+        /* Button Styles */
+        button {
+            background-color: #1e88e5;
+            color: #fff;
+            border: none;
+            padding: 0.8rem 1.6rem;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+            margin: 0.5rem;
+        }
+
+        #bookingDetails table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1rem;
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 1.5rem;
+        }
+
+        #bookingDetails table td {
+            padding: 0.8rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        #bookingDetails table td:first-child {
+            font-weight: bold;
+            width: 30%;
+            text-align: right;
+            padding-right: 1rem;
+            color: #333;
+        }
+
+        #bookingDetails table td:last-child {
+            width: 70%;
+            color: #666;
+        }
+
+        #bookingDetails table td[colspan="2"] {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        button:hover {
+            background-color: #1565c0;
+        }
+
+        #studentDetails table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1rem;
+        }
+
+        #studentDetails table td {
+            padding: 0.8rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        #studentDetails table td:first-child {
+            font-weight: bold;
+            width: 30%;
+            text-align: right;
+            padding-right: 1rem;
+        }
+
+        #studentDetails table td:last-child {
+            width: 70%;
+        }
+
+        /* Mode Toggle Button Styles */
+        #modeToggleButton {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: #1e88e5;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        #modeToggleButton:hover {
+            background-color: #1565c0;
+        }
+
+        /* Student Details Styles */
+        #studentDetails {
+            position: absolute;
+            align-content: center;
+            top: 0;
+            left: 0;
+            width: 30%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.01);
+            border-right: 1px solid #f5f5f5;
+            padding: 2rem;
+            box-sizing: border-box;
+            display: none;
+            overflow-y: auto;
+        }
+
+        /* Booking Details, Issuing Details, and Return Details Styles */
+        #bookingDetails,
+        #issuingDetails,
+        #returnDetails {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 80%;
+            overflow-wrap: break-word;
+            display: none;
+        }
+
+        /* RFID Icon Styles */
+        .rfid-icon {
+            width: 80px;
+            height: 80px;
+            margin-top: 2rem;
+        }
+
+        /* Footer Styles */
+        footer {
+            position: fixed;
+            bottom: 0;
+            padding: 1rem;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .circular-img {
+            position: fixed;
+            bottom: 20px;
+            /* Adjust as needed */
+            right: 20px;
+            /* Adjust as needed */
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Vi-T-rack</h1>
+    <button id="modeToggleButton">SPORT</button>
+    <p>Welcome To <span style="color:#00b8d4">Vi-T-rack</span></p>
+    <button id="scanButton">Scan RFID</button>
+    <button id="CheckinButton" style="display:none;">Check in</button>
+    <button id="CheckoutButton" style="display:none;">Check out</button>
+    <button id="issueItem" style="display:none;">Issue Item</button>
+    <button id="returnItem" style="display:none;">Return Item</button>
+    <button id="home" style="display:none;">Home</button>
+    <svg class="rfid-icon" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 122.88 122.02">
+        <title>rfid</title>
+        <path
+            d="M62.19,48.52a9.83,9.83,0,0,0-.25-19.61h-1a9.83,9.83,0,0,0,0,19.63h1.25ZM24.53,91q6,0,9.29,2.7a8.86,8.86,0,0,1,3.24,7.16q0,5.11-3.17,7.7c-2.11,1.72-5.19,2.58-9.22,2.58l-1.08.56H18.42V122H7.72V91Zm-1.88,13.52a4.41,4.41,0,0,0,2.6-.63,3.27,3.27,0,0,0,0-4.44,4.26,4.26,0,0,0-2.6-.66H18.42v5.73Zm6.47,2.3L38.79,122H26.92l-7.23-13.56,9.43-1.6Zm37.37-7.79H51.75v4.32H63.67v8H51.75V122H40.81V91H66.49v8Zm14.08-8v31H69.63V91Zm19.9,0q7.27,0,11,4t3.71,11.45q0,7.36-3.71,11.43t-11,4.06H85.26V91Zm-1.55,23.19c2,0,3.38-.62,4.06-1.86a12.78,12.78,0,0,0,1-5.84,12.78,12.78,0,0,0-1-5.84c-.68-1.24-2-1.86-4.06-1.86H96.19v15.4ZM41.57,21.77a4.5,4.5,0,0,0-.51-6.2l-.29-.23a4.4,4.4,0,0,0-3.14-.86,4.45,4.45,0,0,0-2.9,1.5,1.79,1.79,0,0,0-.22.25,41.63,41.63,0,0,0-6.45,10.92A31.56,31.56,0,0,0,28,50.43a40.44,40.44,0,0,0,6.49,10.93,4.49,4.49,0,0,0,6.31.65h0a4.5,4.5,0,0,0,.65-6.32h0a31.57,31.57,0,0,1-5-8.36,22.93,22.93,0,0,1-1.65-8.51,23.32,23.32,0,0,1,1.71-8.56,32.39,32.39,0,0,1,5.08-8.49ZM22.4,7.54a1.37,1.37,0,0,0,.19-.23,4.45,4.45,0,0,0-.43-6.1,1.37,1.37,0,0,0-.22-.2,4.48,4.48,0,0,0-6.18.5A67.93,67.93,0,0,0,3.84,19.91,46.8,46.8,0,0,0,0,39,46.8,46.8,0,0,0,4.47,58,68.05,68.05,0,0,0,17,76.05l.11.11a4.48,4.48,0,0,0,6.23.08l.11-.1a4.56,4.56,0,0,0,1.31-3,4.48,4.48,0,0,0-1.22-3.21A59.49,59.49,0,0,1,12.72,54.48,38.08,38.08,0,0,1,9,38.89a38.45,38.45,0,0,1,3.23-15.72A59,59,0,0,1,22.4,7.54ZM81.31,21.77a4.5,4.5,0,0,1,.51-6.2l.28-.23a4.49,4.49,0,0,1,6.05.64,1.27,1.27,0,0,1,.21.25,41.4,41.4,0,0,1,6.46,10.92,31.56,31.56,0,0,1,.07,23.28A40.44,40.44,0,0,1,88.4,61.36a4.49,4.49,0,0,1-6.31.65h0a4.48,4.48,0,0,1-1.63-3,4.55,4.55,0,0,1,1-3.3h0a31.57,31.57,0,0,0,5-8.36,22.93,22.93,0,0,0,1.65-8.51,23.32,23.32,0,0,0-1.71-8.56,32.39,32.39,0,0,0-5.08-8.49ZM100.48,7.54a1.37,1.37,0,0,1-.19-.23,4.45,4.45,0,0,1,.43-6.1,1.37,1.37,0,0,1,.22-.2,4.48,4.48,0,0,1,6.18.5A67.93,67.93,0,0,1,119,19.91,46.8,46.8,0,0,1,122.87,39a46.8,46.8,0,0,1-4.46,19,68.05,68.05,0,0,1-12.52,18l-.11.11a4.48,4.48,0,0,1-6.23.08l-.11-.1a4.56,4.56,0,0,1-1.31-3,4.48,4.48,0,0,1,1.22-3.21,59.49,59.49,0,0,0,10.81-15.42,38.08,38.08,0,0,0,3.76-15.59,38.45,38.45,0,0,0-3.23-15.72A59,59,0,0,0,100.48,7.54Z" />
+    </svg>
+    <div id="studentDetails"></div>
+    <div id="bookingDetails"></div>
+    <div id="issuingDetails"></div>
+    <div id="returnDetails"></div>
+    <script>
+        // Define a variable to store the current mode
+        let currentMode = "SPORT";
+        let userRFID;
+        let quantity;
+        let time;
+        // Function to toggle between modes and update the button text
+        function toggleMode() {
+            if (currentMode === "SPORT") {
+                currentMode = "GYM";
+                document.getElementById('modeToggleButton').textContent = "GYM";
+            } else {
+                currentMode = "SPORT";
+                document.getElementById('modeToggleButton').textContent = "SPORT";
+            }
+        }
+        // Add event listener to the mode toggle button
+        document.getElementById('modeToggleButton').addEventListener('click', toggleMode);
+
+        document.getElementById('scanButton').addEventListener('click', function () {
+            document.getElementById('scanButton').textContent = 'Scanning...';
+            fetch('/read_rfid', {
+                method: 'GET',
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.error) {
+                        // Extract RFID value from the response
+                        const rfid = data.rfid;
+
+                        // Send RFID value to the /scan endpoint
+                        fetch('/scan', {
+                            method: 'POST',
+                            body: new URLSearchParams({ rfid }), // Send RFID value as form data
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            }
+                        })
+                            .then(response => response.json())
+                            .then(studentData => {
+                                const studentDetailsElement = document.getElementById('studentDetails');
+                                userRFID = studentData.Stu_RFID;
+                                if (!studentData.error) {
+                                    // Construct HTML to display student details
+                                    const html = `
+                                        <table>
+                                            <tr>
+                                                <td>Name:</td>
+                                                <td>${studentData.Stu_Fname} ${studentData.Stu_Lname}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Phone:</td>
+                                                <td>${studentData.Stu_Phone}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>RFID:</td>
+                                                <td>${studentData.Stu_RFID}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Registration Number:</td>
+                                                <td>${studentData.Stu_RegNo}</td>
+                                            </tr>
+                                        </table>
+                                     `;
+                                    studentDetailsElement.innerHTML = html;
+                                    studentDetailsElement.style.display = 'block';
+                                    // Show check-in and check-out buttons after successful scan and hide scanButton
+                                    document.getElementById('scanButton').style.display = 'none';
+                                    document.getElementById('CheckinButton').style.display = 'block';
+                                    document.getElementById('CheckoutButton').style.display = 'block';
+                                } else {
+                                    studentDetailsElement.innerHTML = `<p>${studentData.error}</p>`;
+                                    studentDetailsElement.style.display = 'block';
+                                }
+                            })
+                            .catch(error => console.error('Error:', error));
+                    } else {
+                        alert(data.error);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        document.getElementById('CheckinButton').addEventListener('click', function () {
+            if (currentMode === "GYM") {
+                fetch('/check_in_gym', {
+                    method: 'POST',
+                    body: new URLSearchParams({ rfid: userRFID }),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(bookingData => {
+                        const bookingDetailsElement = document.getElementById('bookingDetails');
+                        if (!bookingData.error) {
+                            const html = `
+                            <table>
+                            <tr>
+                                <td>Booking Details:</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Location:</td>
+                                <td>${bookingData.location}</td>
+                            </tr>
+                            <tr>
+                                <td>Time Slot:</td>
+                                <td>${bookingData.time}</td>
+                            </tr>
+                            <tr>
+                                <td>Status:</td>
+                                <td>${bookingData.status ? 'Active' : 'Inactive'}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">You have now successfully checked in.</td>
+                            </tr>
+                        </table>
+`;
+                            bookingDetailsElement.innerHTML = html;
+                            bookingDetailsElement.style.display = 'block';
+                            document.getElementById('CheckinButton').style.display = 'none';
+                            document.getElementById('CheckoutButton').style.display = 'none';
+                            document.getElementById('home').style.display = "block";
+                        } else {
+                            bookingDetailsElement.innerHTML = `<p>${bookingData.error}</p>`;
+                            bookingDetailsElement.style.display = 'block';
+                            document.getElementById('home').style.display = "block";
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            } else {
+                fetch('/check_in_sport', {
+                    method: 'POST',
+                    body: new URLSearchParams({ rfid: userRFID }),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(bookingData => {
+                        const bookingDetailsElement = document.getElementById('bookingDetails');
+                        if (!bookingData.error) {
+                            const html = `
+                            <table>
+                                <tr>
+                                    <td>Booking Details:</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Time Slot:</td>
+                                    <td>${bookingData.time}</td>
+                                </tr>
+                                <tr>
+                                    <td>Item:</td>
+                                    <td>${bookingData.name}</td>
+                                </tr>
+                                <tr>
+                                    <td>Quantity:</td>
+                                    <td>${bookingData.quantity}</td>
+                                </tr>
+                                <tr>
+                                    <td>Status:</td>
+                                    <td>${bookingData.status ? 'Active' : 'Inactive'}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">You have now successfully checked in.</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">Please issue the items you have booked.</td>
+                                </tr>
+                            </table>
+                            `;
+                            quantity = bookingData.quantity;
+                            bookingDetailsElement.innerHTML = html;
+                            bookingDetailsElement.style.display = 'block';
+                            document.getElementById('CheckinButton').style.display = 'none';
+                            document.getElementById('CheckoutButton').style.display = 'none';
+                            document.getElementById('issueItem').style.display = 'block';
+                        } else {
+                            bookingDetailsElement.innerHTML = `<p>${bookingData.error}</p>`;
+                            bookingDetailsElement.style.display = 'block';
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        });
+
+
+        document.getElementById('CheckoutButton').addEventListener('click', function () {
+            if (currentMode === "GYM") {
+                fetch('/check_out_gym', {
+                    method: 'POST',
+                    body: new URLSearchParams({ rfid: userRFID }),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(responseData => {
+                        if (!responseData.error) {
+                            alert(responseData.message);
+                            document.getElementById('bookingDetails').innerHTML = '<p>Thank You </p> <p>You have successfully checked out</p> ';
+                            document.getElementById('home').style.display = "block";
+                        } else {
+                            alert(responseData.error);
+                            document.getElementById('home').style.display = 'block';
+
+                        }
+                        // Clear user details and hide buttons after checkout
+                        document.getElementById('CheckinButton').style.display = 'none';
+                        document.getElementById('CheckoutButton').style.display = 'none';
+
+                    })
+                    .catch(error => console.error('Error:', error));
+            } else {
+                fetch('/check_out_sport', {
+                    method: 'POST',
+                    body: new URLSearchParams({ rfid: userRFID }),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(responseData => {
+                        console.log("yolo");
+                        if (!responseData.error) {
+                            document.getElementById('bookingDetails').style.display = 'block';
+                            time = responseData.time;
+                            const html = `
+                            <p>Booking Details :</p>
+                            <p>Time Slot: ${responseData.time}</p>
+                            <p>Item: ${responseData.name}</p>
+                            <p>Quantity ${responseData.quantity}</p>
+                            <p>Status: ${responseData.status ? 'Active' : 'Inactive'}</p>
+                            <p>You have now succesfully checked out.</p>
+                            <p>Please return the items you have booked.</p>
+                                        `;
+                            console.log(html);
+                            document.getElementById('bookingDetails').innerHTML = html;
+                            quantity = responseData.quantity;
+
+                            document.getElementById('returnItem').style.display = 'block';
+                        } else {
+                            alert(responseData.error);
+                            document.getElementById('home').style.display = 'block';
+                        }
+                        document.getElementById('CheckinButton').style.display = 'none';
+                        document.getElementById('CheckoutButton').style.display = 'none';
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        });
+
+
+
+        document.getElementById('issueItem').addEventListener('click', function () {
+            console.log("called");
+            fetch('/read_rfid', {
+                method: 'GET',
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.error) {
+                        // Extract RFID value from the response
+                        const rfid = data.rfid;
+                        console.log(rfid);
+                        // Send RFID value and userRFID to the /issue_equipment endpoint
+                        fetch('/issue_equipment', {
+                            method: 'POST',
+                            body: new URLSearchParams({
+                                user_rfid: userRFID,
+                                equipment_rfid: rfid,
+                                slot_time: time
+                            }), // Send RFID values as form data
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            }
+                        })
+                            .then(response => response.json())
+                            .then(issueData => {
+                                if (!issueData.error) {
+                                    // Update the quantity variable by subtracting 1
+                                    quantity--;
+                                    // code to show name returned here
+                                    // Check if quantity is zero
+                                    const issuingDetailsElement = document.getElementById('issuingDetails');
+                                    issuingDetailsElement.innerHTML = `<p>Thank you for issuing ${issueData.name}</p>`;
+                                    issuingDetailsElement.style.display = 'block';
+                                    if (quantity === 0) {
+                                        // Display a thank you message
+                                        const issuingDetailsElement = document.getElementById('issuingDetails');
+                                        issuingDetailsElement.innerHTML = `<p>Thank you for issuing.</p>`;
+                                        issuingDetailsElement.style.display = 'block';
+
+                                        // Hide the "Issue Item" button
+                                        document.getElementById('issueItem').style.display = 'none';
+                                        document.getElementById('home').style.display = 'block';
+                                    }
+                                } else {
+                                    // Display error message if issuance failed
+                                    alert(issueData.error);
+                                    document.getElementById('home').style.display = 'block';
+                                }
+
+                            })
+                            .catch(error => console.error('Error:', error));
+                    } else {
+                        alert(data.error);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        document.getElementById('returnItem').addEventListener('click', function () {
+            fetch('/read_rfid', {
+                method: 'GET',
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.error) {
+                        // Extract RFID value from the response
+                        const rfid = data.rfid;
+                        console.log(rfid);
+                        // Send RFID value and userRFID to the /return_equipment endpoint
+                        fetch('/return_equipment', {
+                            method: 'POST',
+                            body: new URLSearchParams({
+                                user_rfid: userRFID,
+                                equipment_rfid: rfid,
+                                slot_time: time
+                            }), // Send RFID values as form data
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            }
+                        })
+                            .then(response => response.json())
+                            .then(returnData => {
+                                if (!returnData.error) {
+                                    // Update the quantity variable by subtracting 1
+                                    quantity--;
+                                    // Check if quantity is zero
+                                    const returnDetailsElement = document.getElementById('returnDetails');
+                                    returnDetailsElement.innerHTML = `<p>Thank you for returning ${returnData.name}</p>`;
+                                    returnDetailsElement.style.display = 'block';
+                                    if (quantity === 0) {
+                                        // Display a thank you message
+                                        document.getElementById('bookingDetails').innerHTML = '';
+                                        const returnDetailsElement = document.getElementById('returnDetails');
+                                        returnDetailsElement.innerHTML = `<p>Thank you for returning.</p>`;
+                                        returnDetailsElement.style.display = 'block';
+
+                                        // Hide the "Return Item" button
+                                        document.getElementById('returnItem').style.display = 'none';
+                                        document.getElementById('home').style.display = 'block';
+                                    }
+                                } else {
+                                    // Display error message if return failed
+                                    alert(returnData.error);
+                                }
+
+                            })
+                            .catch(error => console.error('Error:', error));
+                    } else {
+                        alert(data.error);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        document.getElementById('home').addEventListener('click', function () {
+            location.reload();
+        });
+
+    </script>
+    <footer>Developed by Team Marshmallow
+        <a href="https://github.com/hercules2209" target="_blank">
+            <img class="circular-img"
+                src="https://cdn-images.threadless.com/threadless-media/artist_shops/shops/FloraPate/products/727288/shirt-1535183727-d8286612316b38c4dd1b261c81c2e669.png?v=3&d=eyJvcHMiOiBbWyJpZl8iLCBbeyJ0IjogImV4cHIiLCAidiI6IFsiaGFzX2FscGhhIiwgbnVsbCwgbnVsbF19LCB7InQiOiAiY29tcCIsICJ2IjogWyJ0aHJlYWRsZXNzLW1lZGlhL2FydGlzdF9zaG9wcy9zaG9wcy9GbG9yYVBhdGUvcHJvZHVjdHMvNzI3Mjg4L3NoaXJ0LTE1MzUxODM3MjctZDgyODY2MTIzMTZiMzhjNGRkMWIyNjFjODFjMmU2NjkucG5nIiwgW1sidHJpbSIsIFt0cnVlLCBmYWxzZV0sIHt9XSwgWyJyZXNpemUiLCBbNDExLjQyODU3MTQyODU3MTQsIDQxMS40Mjg1NzE0Mjg1NzE0XSwgeyJtYXhfc2NhbGUiOiAyLjB9XSwgWyJjYW52YXNfY2VudGVyZWQiLCBbNTE0LjI4NTcxNDI4NTcxNDIsIDUxNC4yODU3MTQyODU3MTQyXSwgeyJiYWNrZ3JvdW5kIjogImZmZmZmZiJ9XV1dfSwgeyJ0IjogImNvbXAiLCAidiI6IFsidGhyZWFkbGVzcy1tZWRpYS9hcnRpc3Rfc2hvcHMvc2hvcHMvRmxvcmFQYXRlL3Byb2R1Y3RzLzcyNzI4OC9zaGlydC0xNTM1MTgzNzI3LWQ4Mjg2NjEyMzE2YjM4YzRkZDFiMjYxYzgxYzJlNjY5LnBuZyIsIFtbInJlc2l6ZSIsIFs1MTQuMjg1NzE0Mjg1NzE0MiwgNTE0LjI4NTcxNDI4NTcxNDJdLCB7Im1heF9zY2FsZSI6IDIuMH1dLCBbImNhbnZhc19jZW50ZXJlZCIsIFs1MTQuMjg1NzE0Mjg1NzE0MiwgNTE0LjI4NTcxNDI4NTcxNDJdLCB7ImJhY2tncm91bmQiOiAiZmZmIn1dXV19XSwge31dLCBbImVuY29kZSIsIFsiLnBuZyJdLCB7ImRwaSI6IDMwMH1dLCBbInJlc2l6ZSIsIFsxNjIzXSwge31dLCBbIm92ZXJsYXkiLCBbInRocmVhZGxlc3MtbWVkaWEvYXJ0aXN0X3Nob3BzL292ZXJsYXlzLzU5ZjllYjYwODNiNTU3NmE3N2FjNmU1NTNhYjA0MjhkL2Zyb250LTE0NzMyNzU3NjEtNTMzNDlkM2EyOTRlZmJkYTZlMWZhYTE3ZTQ1MDU1NGYucG5nIl0sIHsieCI6IDE4OCwgInkiOiAxODgsICJiYWNrZ3JvdW5kIjogImZmZmZmZiJ9XSwgWyJyZXNpemUiLCBbODAwXSwge31dLCBbImNhbnZhc19jZW50ZXJlZCIsIFs4MDAsIDgwMCwgIiNmZmZmZmYiXSwge31dLCBbImVuY29kZSIsIFsianBnIiwgODVdLCB7fV1dLCAiZm9yY2UiOiBmYWxzZSwgIm9ubHlfbWV0YSI6IGZhbHNlfQ=="
+                alt="Circular Image">
+        </a>
+    </footer>
+</body>
+
+</html>
